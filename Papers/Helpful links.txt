@@ -5,3 +5,14 @@ https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-s
 
 Transformer
 https://jalammar.github.io/illustrated-transformer/
+
+
+
+How BERT Works 
+
+https://www.kaggle.com/abhinand05/bert-for-humans-tutorial-baseline/notebook
+
+
+Hugging Face Transformers for sentiment analysis
+
+https://towardsdatascience.com/fastai-with-transformers-bert-roberta-xlnet-xlm-distilbert-4f41ee18ecb2
