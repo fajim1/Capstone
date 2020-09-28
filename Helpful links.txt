@@ -10,6 +10,9 @@ https://jalammar.github.io/illustrated-transformer/
 
 How BERT Works 
 
+https://jalammar.github.io/illustrated-bert/
+
+
 https://www.kaggle.com/abhinand05/bert-for-humans-tutorial-baseline/notebook
 
 
