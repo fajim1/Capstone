@@ -2,8 +2,6 @@ from __future__ import print_function
 import sklearn
 
 #%%
-import lime
-#%%
 import os
 import numpy as np
 import pandas as pd
@@ -21,13 +19,15 @@ from transformers import AlbertTokenizer, AlbertForSequenceClassification
 import torch
 import torch.nn as nn
 
-#%%
-import lime
 
-from lime import lime_text
-from lime.lime_text import LimeTextExplainer
+from captum.attr import IntegratedGradients, LayerIntegratedGradients
+from captum.attr import InterpretableEmbeddingBase, TokenReferenceBase
+from captum.attr import visualization
+from captum.attr import configure_interpretable_embedding_layer, remove_interpretable_embedding_layer
+
 
 #%%
+
 
 tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=5)
 model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=5)
@@ -52,51 +52,6 @@ model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/bert.pt"))
 
 df_AR = pd.read_csv('Dataset/Amazon Food Reviews/processed_data/predict.csv')
 
-
-# %%
-class Prediction:
-
-    def __init__(self):
-        self.model = model_B
-        self.tokenizer = tokenizer_B
-
-    def predictor(self, texts):
-        results = []
-        for text in texts:
-            # labels = torch.tensor([1]).unsqueeze(0)
-            inputs = self.tokenizer(text, return_tensors="pt")
-            outputs = self.model(**inputs)
-            logits = outputs.logits
-
-            res = softmax(logits.detach().numpy())[0]
-
-            results.append(res)
-
-        ress = [res for res in results]
-        results_array = np.array(ress)
-        return results_array
-
-
-# %%
-explainer = LimeTextExplainer(class_names=[0, 1, 2, 3, 4])
-
-prediction = Prediction()
-#%%
-text = df_AR.iloc[925, 1]
-exp = explainer.explain_instance(text, prediction.predictor, labels=(0, 1, 2, 3, 4), num_features=5,
-                                 num_samples=len(text.split()))
-exp.show_in_notebook(text=True)
-
-# %%
-
-exp.save_to_file('Dataset/Amazon Food Reviews/html/label3.html')
-
-# %%
-
-from captum.attr import IntegratedGradients, LayerIntegratedGradients
-from captum.attr import InterpretableEmbeddingBase, TokenReferenceBase
-from captum.attr import visualization
-from captum.attr import configure_interpretable_embedding_layer, remove_interpretable_embedding_layer
 
 
 # %%
