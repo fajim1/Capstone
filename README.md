@@ -8,7 +8,7 @@ The [Code skeleton](https://github.com/fajim1/Capstone/tree/master/Code%20Skelet
 There are 6 python scripts which needs to be run in a specific order to ensure reproducibility. There are also four sub-directories for convenience, namely to store the original dataset, pre processed dataset, trained model and visualizations. Keeping the format of the sub-directories is optional but the path to load the models and dataset should be carefully maintained in the .py scripts. 
 
 ### Note : 
-Anywhere that the path to a model or dataset is required is marked in the .py files in '#'comments
+Anywhere that the path to a model or dataset is required is marked in the .py files in #comments
 
 # 1 preprocess.py 
 
