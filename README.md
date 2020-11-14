@@ -1,6 +1,6 @@
 # Capstone
 
-The [Code skeleton](https://github.com/fajim1/Capstone/tree/master/Code%20Skeleton) directory gives a general gives a general structure to use on any multilabel text dataset while 
+The [Code skeleton](https://github.com/fajim1/Capstone/tree/master/Code%20Skeleton) directory gives a general structure to use on any multilabel text dataset while 
 [Dataset + Code](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code) directory is dataset specific. Right now only the [Amazon Food Reviews](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code/Amazon%20Food%20Reviews) is complete with the other datasets being updated soon enough. This Readme will go through the [Amazon Food Reviews](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code/Amazon%20Food%20Reviews) directory so that it can be reproduced 
 
 # General structure 
