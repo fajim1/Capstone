@@ -22,7 +22,17 @@ import torch
 import torch.nn as nn
 
 #%%
+
+# Set Directory as appropiate
 df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Preprocess_Reviews.csv')
+
+#%%
+
+#Loading the model from google storage and saving the models into the current directory
+
+os.system('wget https://storage.googleapis.com/bert_model123/bert.pt')
+os.system('wget https://storage.googleapis.com/bert_model123/roberta.pt')
+os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #%%
 tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=5)
@@ -37,6 +47,10 @@ model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', ret
 
 
 #%%
+
+#Either load the models from google storage or the one trained in Train.py
+
+# Set Directory as appropiate
 model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/bert.pt"))
 
 model_RB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/roberta.pt"))

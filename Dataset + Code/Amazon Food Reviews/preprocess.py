@@ -28,11 +28,10 @@ import torch
 
 # %%
 
+# Set Directory as appropiate
 df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Reviews2.csv',nrows = 10000)
 
 
-#%%
-# df_AR.to_csv('Dataset/Amazon Food Reviews/Reviews2.csv', index=False)
 
 #%%
 
@@ -55,4 +54,5 @@ df_AR = pd.concat([zero,one,two,three,four_u])
 sns.countplot(df_AR['Score'])
 plt.show()
 #%%
+
 df_AR.to_csv('Dataset/Amazon Food Reviews/processed_data/Preprocess.csv', index=False)

@@ -39,9 +39,18 @@ model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', ret
 # tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=5)
 # model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=5)
 
+#%%
 
+#Loading the model from google storage and saving the models into the current directory
+
+os.system('wget https://storage.googleapis.com/bert_model123/bert.pt')
+os.system('wget https://storage.googleapis.com/bert_model123/roberta.pt')
+os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #%%
+
+#Either load the models from google storage or the one trained in Train.py
+
 model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/bert.pt"))
 
 # model_RB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/roberta.pt"))
@@ -51,7 +60,6 @@ model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/bert.pt"))
 #%%
 
 df_AR = pd.read_csv('Dataset/Amazon Food Reviews/processed_data/predict.csv')
-
 
 
 # %%
