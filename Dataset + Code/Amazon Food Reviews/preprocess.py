@@ -28,12 +28,11 @@ import torch
 
 # %%
 
-df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Reviews.csv',nrows = 2000)
+df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Reviews2.csv',nrows = 10000)
 
-df_AR = df_AR.iloc[:,[6,8]]
 
-df_AR['Score'] = df_AR['Score']-1
-df_AR['Score'].unique()
+#%%
+# df_AR.to_csv('Dataset/Amazon Food Reviews/Reviews2.csv', index=False)
 
 #%%
 
