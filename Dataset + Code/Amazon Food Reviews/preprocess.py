@@ -31,7 +31,9 @@ import torch
 # Set Directory as appropiate
 df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Reviews2.csv',nrows = 10000)
 
-
+#%%
+sns.countplot(df_AR['Score'])
+plt.show()
 
 #%%
 
@@ -41,14 +43,14 @@ two = df_AR[df_AR.Score==2]
 three = df_AR[df_AR.Score==3]
 four = df_AR[df_AR.Score==4]
 
-# upsample minority
+# downsample majority
 four_u = resample(four,
                   replace=True, # sample with replacement
                   n_samples=len(three), # match number with majority class
                   random_state=42) # reproducible results
 
 
-# combine majority and upsampled minority
+# combine majority and downsample minority
 df_AR = pd.concat([zero,one,two,three,four_u])
 #%%
 sns.countplot(df_AR['Score'])
