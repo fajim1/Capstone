@@ -24,7 +24,7 @@ import torch.nn as nn
 #%%
 
 # Set Directory as appropiate
-df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Preprocess_Reviews.csv')
+df_AR = pd.read_csv('Dataset/Amazon Food Reviews/Preprocess.csv')
 
 #%%
 
