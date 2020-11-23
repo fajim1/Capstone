@@ -73,7 +73,7 @@ print('\n')
 y_test = df_AR['Score']
 y_pred = df_AR['albert_Labels']
 
-print("BERT")
+print("ALBERT")
 #importing confusion matrix
 from sklearn.metrics import confusion_matrix
 confusion = confusion_matrix(y_test, y_pred)
