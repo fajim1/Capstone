@@ -24,7 +24,10 @@ import torch
 import torch.nn as nn
 
 import torch
+#%%
 
+import os
+os.chdir('/home/ubuntu/transformers/Dataset/Restaurant Reviews')
 
 # %%
 

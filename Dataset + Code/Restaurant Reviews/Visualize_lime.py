@@ -30,15 +30,12 @@ from lime.lime_text import LimeTextExplainer
 
 #%%
 
-tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=5)
-model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=5)
+tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=2)
+model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=2)
 
 
-tokenizer_RB = RobertaTokenizer.from_pretrained('roberta-base',num_labels=5)
-model_RB = RobertaForSequenceClassification.from_pretrained('roberta-base', return_dict=True,num_labels=5)
-
-tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=5)
-model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=5)
+tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=2)
+model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=2)
 
 #%%
 
@@ -52,20 +49,19 @@ os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #Either load the models from google storage or the one trained in Train.py
 
-model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/bert.pt"))
-
-model_RB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/roberta.pt"))
-
-model_AB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/albert.pt"))
+model_B.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/bert.pt"))
 
 
-#%%
-model_SVM = pickle.load(open('Dataset/Amazon Food Reviews/model/svm.pkl', 'rb'))
+model_AB.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/albert.pt"))
+
 
 #%%
+model_SVM = pickle.load(open('Dataset/Restaurant Reviews/model/svm.pkl', 'rb'))
 
-df_AR = pd.read_csv('Dataset/Amazon Food Reviews/processed_data/Preprocess.csv')
+#%%
 
+df_RR = pd.read_csv('Dataset/Restaurant Reviews/processed_data/Preprocess.csv')
+df_RR
 #%%
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create feature vectors
@@ -74,11 +70,8 @@ vectorizer = TfidfVectorizer(min_df = 4,
                              sublinear_tf = True,
                              use_idf = True)
 
-train_vectors = vectorizer.fit_transform(df_AR['Summary'])
+train_vectors = vectorizer.fit_transform(df_RR['Review'])
 
-#%%
-review_vector = vectorizer.transform(["horrible"]) # vectorizing
-print(model_SVM.predict_proba(review_vector)[0])
 # %%
 
 #Change to appropiate model in the class
@@ -129,7 +122,7 @@ class Prediction_SVM:
         return results_array
 
 # %%
-explainer = LimeTextExplainer(class_names=[0, 1, 2, 3, 4])
+explainer = LimeTextExplainer(class_names=[0, 1])
 
 prediction_B = Prediction_Transformer(model_B,tokenizer_B)
 
@@ -143,22 +136,22 @@ c = 150
 
 for i in range(0,1):
     #BERT
-    text = df_AR.iloc[c, 1]  # Example text
-    exp = explainer.explain_instance(text, prediction_B.predictor, labels=(0, 1, 2, 3, 4), num_features=5,
+    text = df_RR.iloc[c, 0]  # Example text
+    exp = explainer.explain_instance(text, prediction_B.predictor, labels=(0, 1), num_features=5,
                                      num_samples=len(text.split()))
     exp.show_in_notebook(text=True)
 
     exp.save_to_file('Dataset/Amazon Food Reviews/html/bert_example{}.html'.format(i))
 
     #AlBERT
-    exp = explainer.explain_instance(text, prediction_AB.predictor, labels=(0, 1, 2, 3, 4), num_features=5,
+    exp = explainer.explain_instance(text, prediction_AB.predictor, labels=(0, 1), num_features=5,
                                      num_samples=len(text.split()))
     exp.show_in_notebook(text=True)
 
     exp.save_to_file('Dataset/Amazon Food Reviews/html/Albert_example{}.html'.format(i))
 
     #SVM
-    exp = explainer.explain_instance(text, prediction_SVM.predictor, labels=(0, 1, 2, 3, 4), num_features=5,
+    exp = explainer.explain_instance(text, prediction_SVM.predictor, labels=(0, 1), num_features=5,
                                      num_samples=len(text.split()))
     exp.show_in_notebook(text=True)
 

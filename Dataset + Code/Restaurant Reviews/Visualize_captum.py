@@ -51,7 +51,7 @@ os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #Either load the models from google storage or the one trained in Train.py
 
-model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/bert.pt"))
+model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/bert.pt"))
 
 # model_RB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/roberta.pt"))
 #
@@ -125,7 +125,7 @@ def interpret_sentence(model_wrapper, sentence, label=1):
     # predict
     pred = model_wrapper(input_embedding).item()
     pred_ind = round(pred)
-
+    print(pred,pred_ind)
     # compute attributions and approximation delta using integrated gradients
     attributions_ig, delta = ig.attribute(input_embedding, n_steps=500, return_convergence_delta=True)
 

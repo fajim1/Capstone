@@ -25,6 +25,13 @@ import torch.nn as nn
 
 import torch
 
+# %% --------------------------------------- Set-Up --------------------------------------------------------------------
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+torch.manual_seed(42)
+np.random.seed(42)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 
 # %%
 
@@ -46,18 +53,15 @@ for i in np.array(df_RR.iloc[:,0]):
 
 tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=2)
 model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=2)
+model_B.to(device)
 
-
-tokenizer_RB = RobertaTokenizer.from_pretrained('roberta-base',num_labels=2)
-model_RB = RobertaForSequenceClassification.from_pretrained('roberta-base', return_dict=True,num_labels=2)
 
 tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=2)
 model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=2)
-
+model_AB.to(device)
 #%%
 model_B.train()
 
-model_RB.train()
 
 model_AB.train()
 
@@ -80,14 +84,14 @@ for epochs in range(20):
     for text,label in zip(text_batch,label_batch):
         encoding = tokenizer_B(text, return_tensors='pt', padding=True, truncation=True)
 
-        input_ids = encoding['input_ids']
-        attention_mask = encoding['attention_mask']
-        labels = torch.tensor([label]).unsqueeze(0)
+        input_ids = encoding['input_ids'].to(device)
+        attention_mask = encoding['attention_mask'].to(device)
+        labels = torch.tensor([label]).unsqueeze(0).to(device)
 
         outputs = model_B(input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs.loss
 
-        loss_a.append(loss.detach())
+        loss_a.append(loss.detach().cpu())
 
 
         loss.backward()
@@ -99,42 +103,6 @@ for epochs in range(20):
 
 #%%
 
-from transformers import AdamW
-optimizer = AdamW(model_RB.parameters(), lr=1e-4)
-
-#%%
-
-for param in model_RB.base_model.parameters():
-    param.requires_grad = False
-
-
-#%%
-text_batch = txt
-label_batch = np.array(df_RR.iloc[:,1])
-#%%
-for epochs in range(20):
-    loss_a = []
-    for text,label in zip(text_batch,label_batch):
-        encoding = tokenizer_RB(text, return_tensors='pt', padding=True, truncation=True)
-
-        input_ids = encoding['input_ids']
-        attention_mask = encoding['attention_mask']
-        labels = torch.tensor([label]).unsqueeze(0)
-
-        outputs = model_RB(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = outputs.loss
-
-        loss_a.append(loss.detach())
-
-
-        loss.backward()
-
-        optimizer.step()
-
-    if epochs%1==0:
-        loss_a = np.array(loss_a)
-        print("After {} epochs, loss is {}".format(epochs,np.mean(loss_a)))
-#%%
 
 from transformers import AdamW
 optimizer = AdamW(model_AB.parameters(), lr=1e-4)
@@ -154,14 +122,14 @@ for epochs in range(20):
     for text,label in zip(text_batch,label_batch):
         encoding = tokenizer_AB(text, return_tensors='pt', padding=True, truncation=True)
 
-        input_ids = encoding['input_ids']
-        attention_mask = encoding['attention_mask']
-        labels = torch.tensor([label]).unsqueeze(0)
+        input_ids = encoding['input_ids'].to(device)
+        attention_mask = encoding['attention_mask'].to(device)
+        labels = torch.tensor([label]).unsqueeze(0).to(device)
 
         outputs = model_AB(input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs.loss
 
-        loss_a.append(loss.detach())
+        loss_a.append(loss.detach().cpu())
 
 
         loss.backward()
@@ -174,16 +142,12 @@ for epochs in range(20):
 
 # Set Directory as appropiate
 
-torch.save(model_B.state_dict(), "Dataset/Restaurant Reviews/model/r_bert.pt")
+torch.save(model_B.state_dict(), "Dataset/Restaurant Reviews/model/bert.pt")
 
 
 #%%
 
-torch.save(model_RB.state_dict(), "Dataset/Restaurant Reviews/model/r_roberta.pt")
-
-#%%
-
-torch.save(model_AB.state_dict(), "Dataset/Restaurant Reviews/model/r_albert.pt")
+torch.save(model_AB.state_dict(), "Dataset/Restaurant Reviews/model/albert.pt")
 
 
 #%%
