@@ -33,17 +33,10 @@ from lime.lime_text import LimeTextExplainer
 tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=2)
 model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=2)
 
-
-tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=2)
-model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=2)
-
 #%%
 
 #Loading the model from google storage and saving the models into the current directory
 
-os.system('wget https://storage.googleapis.com/bert_model123/bert.pt')
-os.system('wget https://storage.googleapis.com/bert_model123/roberta.pt')
-os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #%%
 
@@ -52,25 +45,11 @@ os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 model_B.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/bert.pt"))
 
 
-model_AB.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/albert.pt"))
-
-
-#%%
-model_SVM = pickle.load(open('Dataset/Restaurant Reviews/model/svm.pkl', 'rb'))
 
 #%%
 
 df_RR = pd.read_csv('Dataset/Restaurant Reviews/processed_data/Preprocess.csv')
 df_RR
-#%%
-from sklearn.feature_extraction.text import TfidfVectorizer
-# Create feature vectors
-vectorizer = TfidfVectorizer(min_df = 4,
-                             max_df = 0.8,
-                             sublinear_tf = True,
-                             use_idf = True)
-
-train_vectors = vectorizer.fit_transform(df_RR['Review'])
 
 # %%
 
@@ -97,38 +76,13 @@ class Prediction_Transformer:
         ress = [res for res in results]
         results_array = np.array(ress)
         return results_array
-#%%
-
-class Prediction_SVM:
-
-    def __init__(self,model):
-        self.model = model
-
-    def predictor(self, texts):
-        results = []
-        for text in texts:
-            # labels = torch.tensor([1]).unsqueeze(0)
-            review_vector = vectorizer.transform([text])
-
-            logits = self.model.predict_proba(review_vector)[0]
-
-
-            res = logits
-
-            results.append(res)
-
-        ress = [res for res in results]
-        results_array = np.array(ress)
-        return results_array
 
 # %%
 explainer = LimeTextExplainer(class_names=[0, 1])
 
 prediction_B = Prediction_Transformer(model_B,tokenizer_B)
 
-prediction_AB = Prediction_Transformer(model_AB,tokenizer_AB)
 
-prediction_SVM = Prediction_SVM(model_SVM)
 
 #%%
 
