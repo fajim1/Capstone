@@ -42,14 +42,14 @@ model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', ret
 
 #Either load the models from google storage or the one trained in Train.py
 
-model_B.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/bert.pt"))
+model_B.load_state_dict(torch.load("Dataset/SST-2/model/bert.pt"))
 
 
 
 #%%
 
-df_RR = pd.read_csv('Dataset/Restaurant Reviews/processed_data/Preprocess.csv')
-df_RR
+df_SR = pd.read_csv('Dataset/SST-2/processed_data/Preprocess.csv')
+df_SR
 
 # %%
 
@@ -90,25 +90,10 @@ c = 150
 
 for i in range(0,1):
     #BERT
-    text = df_RR.iloc[c, 0]  # Example text
+    text = df_SR.iloc[c, 0]  # Example text
     exp = explainer.explain_instance(text, prediction_B.predictor, labels=(0, 1), num_features=5,
                                      num_samples=len(text.split()))
     exp.show_in_notebook(text=True)
 
-    exp.save_to_file('Dataset/Amazon Food Reviews/html/bert_example{}.html'.format(i))
+    exp.save_to_file('Dataset/SST-2/results/bert_example{}.html'.format(i))
 
-    #AlBERT
-    exp = explainer.explain_instance(text, prediction_AB.predictor, labels=(0, 1), num_features=5,
-                                     num_samples=len(text.split()))
-    exp.show_in_notebook(text=True)
-
-    exp.save_to_file('Dataset/Amazon Food Reviews/html/Albert_example{}.html'.format(i))
-
-    #SVM
-    exp = explainer.explain_instance(text, prediction_SVM.predictor, labels=(0, 1), num_features=5,
-                                     num_samples=len(text.split()))
-    exp.show_in_notebook(text=True)
-
-    exp.save_to_file('Dataset/Amazon Food Reviews/html/SVM_example{}.html'.format(i))
-
-    # c = c+100

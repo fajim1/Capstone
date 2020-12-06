@@ -145,7 +145,7 @@ class CNN(nn.Module):
         self.convnorm2 = nn.BatchNorm1d(args.embedding_dim)
         self.pool2 = nn.MaxPool1d(2)
 
-        self.conv3 = nn.Conv1d(args.embedding_dim, args.embedding_dim, 7)
+        self.conv3 = nn.Conv1d(args.embedding_dim, args.embedding_dim, 2)
         self.linear = nn.Linear(args.embedding_dim, 1)
         self.act = torch.relu
         self.act2 = torch.sigmoid
@@ -159,19 +159,13 @@ class CNN(nn.Module):
 
         return self.act2(self.linear(self.act(self.conv3(x)).reshape(-1, args.embedding_dim)))
 
-
 # %% -------------------------------------- Data Prep ------------------------------------------------------------------
-data_train = pd.read_csv("SST-2/train.tsv", sep="\t")
-x_train_raw, y_train = data_train["sentence"].values, torch.FloatTensor(data_train["label"].values).to(device)
-data_dev = pd.read_csv("SST-2/dev.tsv", sep="\t")
-x_dev_raw, y_dev = data_dev["sentence"].values, torch.FloatTensor(data_dev["label"].values).to(device)
-#%%
+
 df_RR = pd.read_csv('Dataset/Restaurant Reviews/processed_data/Preprocess.csv')
 df_RR
 
 #%%
-x_train_raw, x_dev_raw, y_train, y_test = train_test_split(np.array(df_RR.iloc[:,0]), np.array(df_RR.iloc[:,1]), random_state=42, test_size=0.2, stratify=df_RR.iloc[:,1])
-
+x_train_raw, x_dev_raw, y_train, y_dev = train_test_split(np.array(df_RR.iloc[:,0]), np.array(df_RR.iloc[:,1]), random_state=42, test_size=0.2, stratify=df_RR.iloc[:,1])
 #%%
 
 try:
@@ -203,9 +197,10 @@ except:
 
 #%%
 x_train, x_dev = torch.LongTensor(x_train).to(device), torch.LongTensor(x_dev).to(device)
-#%%
 y_train = y_train.reshape(-1,1)
+y_train = torch.FloatTensor(y_train).to(device)
 y_dev = y_dev.reshape(-1,1)
+y_dev = torch.FloatTensor(y_dev).to(device)
 # %% -------------------------------------- Training Prep ----------------------------------------------------------
 model = CNN(len(token_ids)).to(device)
 look_up_table = get_glove_table(token_ids, glove_embeddings)
@@ -250,36 +245,15 @@ if args.train:
             epoch, loss_train/train_steps, acc(x_train, y_train), loss_test, acc_dev))
 
         if acc_dev > acc_dev_best and args.save_model:
-            torch.save(model.state_dict(), "cnn_sentiment.pt")
+            torch.save(model.state_dict(), "model/cnn_sentiment.pt")
             print("The model has been saved!")
             acc_dev_best = acc_dev
 
-
 # %% ------------------------------------------ Final test -------------------------------------------------------------
-model.load_state_dict(torch.load("cnn_sentiment.pt"))
+
+model.load_state_dict(torch.load("model/cnn_sentiment.pt"))
 model.eval()
 
-#%%
-torch.save(model, 'cnn_sen.pkl')
-#%%
-model2 = torch.load('cnn_sen.pkl')
-
-#%%
-y_test_pred = acc(x_train, y_train, return_labels=True)
-print("The accuracy on the test set is {:.2f}".format(100*accuracy_score(y_train.cpu().numpy(), y_test_pred), "%"))
-print("The confusion matrix is")
-print(confusion_matrix(y_train.cpu().numpy(), y_test_pred))
-
-#%%
-test = convert_to_ids([x_train_raw[0]], token_ids, args.seq_len)
-#%%
-test = torch.LongTensor(test).to(device)
-
-#%%
-for i in range(10):
-    test = convert_to_ids([x_train_raw[i]], token_ids, args.seq_len)
-    test = torch.LongTensor(test).to(device)
-    print(model(test),y_train[i])
 
 #%%
 import spacy
@@ -298,7 +272,11 @@ token_reference = TokenReferenceBase(reference_token_idx=0)
 vis_data_records_ig = []
 
 
-def interpret_sentence(model, sentence, min_len=args.seq_len, label=0):
+def interpret_sentence(model, sentence, min_len=1, label=0):
+
+    text = [tok.text for tok in nlp.tokenizer(sentence)]
+    if len(text) < min_len:
+        text += ['pad'] * (min_len - len(text))
 
 
     # input_indices dim: [sequence_length]
@@ -308,10 +286,11 @@ def interpret_sentence(model, sentence, min_len=args.seq_len, label=0):
     input = torch.LongTensor(input).to(device)
 
     # predict
+    model.zero_grad()
     logits = forward_with_sigmoid(input)
 
-    pred = model(input)
-    pred_ind = torch.round(logits)[0].cpu().detach().numpy()
+    pred = logits[0].cpu().detach().numpy()[0]
+    pred_ind = torch.round(logits)[0].cpu().detach().numpy()[0]
 
 
 
@@ -322,7 +301,7 @@ def interpret_sentence(model, sentence, min_len=args.seq_len, label=0):
 
     print('pred: ', pred_ind, '(', '%.2f' % pred, ')', ', delta: ', abs(delta))
 
-    add_attributions_to_visualizer(attributions_ig, sentence, pred, pred_ind, label, delta, vis_data_records_ig)
+    add_attributions_to_visualizer(attributions_ig, text, pred, pred_ind, label, delta, vis_data_records_ig)
 
 
 def add_attributions_to_visualizer(attributions, text, pred, pred_ind, label, delta, vis_data_records):
@@ -341,7 +320,49 @@ def add_attributions_to_visualizer(attributions, text, pred, pred_ind, label, de
         text,
         delta))
 #%%
-interpret_sentence(model, 'hide new secretions from the parental units ', label=1)
+interpret_sentence(model, "Service was slow and not attentive", label=0)
 #%%
 visualization.visualize_text(vis_data_records_ig)
+#%%
+
+import lime
+
+from lime import lime_text
+from lime.lime_text import LimeTextExplainer
+
+#%%
+class Prediction_CNN:
+
+    def __init__(self, model):
+        self.model = model
+
+    def predictor(self, texts):
+        results = []
+        for text in texts:
+            # labels = torch.tensor([1]).unsqueeze(0)
+
+            input = convert_to_ids([text], token_ids, args.seq_len)
+            input = torch.LongTensor(input).to(device)
+
+            logits = self.model(input)
+            logits = logits.cpu().detach().numpy()[0][0]
+
+            d = 1 - logits
+
+            res = [d, logits]
+
+            print(res)
+
+            results.append(res)
+
+        ress = [res for res in results]
+        results_array = np.array(ress)
+        return results_array
+#%%
+explainer = LimeTextExplainer(class_names=[0, 1])
+prediction_CNN = Prediction_CNN(model)
+text = 'Service was slow and not attentive'
+exp = explainer.explain_instance(text, prediction_CNN.predictor, labels=(0, 1), num_features=5,
+                                  num_samples=len(text.split()))
+exp.show_in_notebook(text=True)
 #%%

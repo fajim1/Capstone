@@ -39,19 +39,17 @@ model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', ret
 # tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=5)
 # model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=5)
 
-#%%
-
 
 #%%
 
 #Either load the models from google storage or the one trained in Train.py
 
-model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/model/bert.pt"))
+model_B.load_state_dict(torch.load("Dataset/SST-2/model/bert.pt"))
 
 
 #%%
 
-df_AR = pd.read_csv('Dataset/Amazon Food Reviews/processed_data/predict.csv')
+df_SR = pd.read_csv('Dataset/SST-2/processed_data/predict.csv')
 
 
 # %%
@@ -146,7 +144,7 @@ def add_attributions_to_visualizer(attributions, tokens, pred, pred_ind, label, 
 
 # %%
 
-interpret_sentence(bert_model_wrapper, sentence=df_AR.iloc[26, 1], label=df_AR.iloc[26, 0])
+interpret_sentence(bert_model_wrapper, sentence=df_SR.iloc[26, 1], label=df_SR.iloc[26, 0])
 visualization.visualize_text(vis_data_records_ig)
 
 # %%
