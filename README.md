@@ -1,4 +1,4 @@
-# Capstone
+# Capstone - Interpretability of Transformer Models and Comparison of Explainability Tools
 
 The [Code skeleton](https://github.com/fajim1/Capstone/tree/master/Code%20Skeleton) directory gives a general structure to use on any Binary text dataset while 
 [Dataset + Code](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code) directory is dataset specific.  This Readme will go through the [SST dataset](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code/SST-2) directory so that it can be reproduced 
