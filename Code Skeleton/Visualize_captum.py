@@ -29,37 +29,26 @@ from captum.attr import configure_interpretable_embedding_layer, remove_interpre
 #%%
 
 
-tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=5)
-model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=5)
+tokenizer_B = BertTokenizer.from_pretrained('bert-base-uncased',num_labels=2)
+model_B = BertForSequenceClassification.from_pretrained('bert-base-uncased', return_dict=True,num_labels=2)
 
-#
-# tokenizer_RB = RobertaTokenizer.from_pretrained('roberta-base',num_labels=5)
-# model_RB = RobertaForSequenceClassification.from_pretrained('roberta-base', return_dict=True,num_labels=5)
-#
-# tokenizer_AB = AlbertTokenizer.from_pretrained('albert-base-v2',num_labels=5)
-# model_AB = AlbertForSequenceClassification.from_pretrained('albert-base-v2', return_dict=True,num_labels=5)
 
 #%%
 
 #Loading the model from google storage and saving the models into the current directory
 
 os.system('wget https://storage.googleapis.com/bert_model123/bert.pt')
-os.system('wget https://storage.googleapis.com/bert_model123/roberta.pt')
-os.system('wget https://storage.googleapis.com/bert_model123/albert.pt')
 
 #%%
 
 #Either load the models from google storage or the one trained in Train.py
 
-model_B.load_state_dict(torch.load("Dataset/Amazon Food Reviews/bert.pt"))
+model_B.load_state_dict(torch.load("Dataset/Restaurant Reviews/model/bert.pt"))
 
-# model_RB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/roberta.pt"))
-#
-# model_AB.load_state_dict(torch.load("Dataset/Amazon Food Reviews/albert.pt"))
 
 #%%
 
-df_AR = pd.read_csv('Dataset/Amazon Food Reviews/processed_data/predict.csv')
+df_AR = pd.read_csv('Dataset/Restaurant Reviews/processed_data/Preprocess.csv')
 
 
 # %%
@@ -125,7 +114,7 @@ def interpret_sentence(model_wrapper, sentence, label=1):
     # predict
     pred = model_wrapper(input_embedding).item()
     pred_ind = round(pred)
-
+    print(pred,pred_ind)
     # compute attributions and approximation delta using integrated gradients
     attributions_ig, delta = ig.attribute(input_embedding, n_steps=500, return_convergence_delta=True)
 
@@ -154,7 +143,7 @@ def add_attributions_to_visualizer(attributions, tokens, pred, pred_ind, label, 
 
 # %%
 
-interpret_sentence(bert_model_wrapper, sentence=df_AR.iloc[26, 1], label=df_AR.iloc[26, 0])
+interpret_sentence(bert_model_wrapper, 'Service was slow and not attentive', 0)
 visualization.visualize_text(vis_data_records_ig)
 
 # %%
