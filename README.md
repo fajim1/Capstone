@@ -1,11 +1,11 @@
 # Capstone
 
 The [Code skeleton](https://github.com/fajim1/Capstone/tree/master/Code%20Skeleton) directory gives a general structure to use on any Binary text dataset while 
-[Dataset + Code](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code) directory is dataset specific.  This Readme will go through the [Amazon Food Reviews](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code/Restaurant%20Reviews) directory so that it can be reproduced 
+[Dataset + Code](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code) directory is dataset specific.  This Readme will go through the [SST dataset](https://github.com/fajim1/Capstone/tree/master/Dataset%20%2B%20Code/SST-2) directory so that it can be reproduced 
 
 # General structure 
 
-There are 6 python scripts which needs to be run in a specific order (given below) to ensure reproducibility. There are also three sub-directories for convenience, namely to store the original dataset, pre processed dataset and visualizations. Keeping the format of the sub-directories is optional but the path to load the models and dataset should be carefully maintained in the .py scripts. 
+There are 5 python scripts which needs to be run in a specific order (given below) to ensure reproducibility. There are also three sub-directories for convenience, namely to store the original dataset, pre processed dataset and visualizations. Keeping the format of the sub-directories is optional but the path to load the models and dataset should be carefully maintained in the .py scripts. 
 
 ### Note : 
 Anywhere that the path to a model or dataset is required is marked in the .py files as a #comments
